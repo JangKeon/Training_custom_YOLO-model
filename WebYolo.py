@@ -18,16 +18,17 @@ parser.add_argument('--video', help='Path to video file.')
 args = parser.parse_args()
 
 # Load names of classes
-classesFile = "obj_JK.names"
+classesFile = "obj.names"
 classes = None
 with open(classesFile, 'rt') as f:
     classes = f.read().rstrip('\n').split('\n')
 
 # Give the configuration and weight files for the model and load the network using them.
-modelConfiguration = "C:\yolo.cfg"
+modelConfiguration = "C:\yolo_n.cfg"
 modelWeights = "C:\yolo_n_10000.weights"
 
 net = cv.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
+count = 0
 
 if (args.device == 'cpu'):
     net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
@@ -77,6 +78,7 @@ def postprocess(frame, outs):
     classIds = []
     confidences = []
     boxes = []
+    Threshold = []
     for out in outs:
         for detection in out:
             scores = detection[5:]
@@ -104,6 +106,7 @@ def postprocess(frame, outs):
         width = box[2]
         height = box[3]
         drawPred(classIds[i], confidences[i], left, top, left + width, top + height)
+
 
 
 # Process inputs
@@ -134,7 +137,7 @@ if (not args.image):
     vid_writer = cv.VideoWriter(outputFile, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'), 30,
                                 (round(cap.get(cv.CAP_PROP_FRAME_WIDTH)), round(cap.get(cv.CAP_PROP_FRAME_HEIGHT))))
 
-while cv.waitKey(1) < 0:
+while cv.waitKey(10) < 0:
 
     # get frame from the video
     hasFrame, frame = cap.read()
