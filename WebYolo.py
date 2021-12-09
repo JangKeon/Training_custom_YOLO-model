@@ -78,7 +78,6 @@ def postprocess(frame, outs):
     classIds = []
     confidences = []
     boxes = []
-    Threshold = []
     for out in outs:
         for detection in out:
             scores = detection[5:]
@@ -94,6 +93,8 @@ def postprocess(frame, outs):
                 classIds.append(classId)
                 confidences.append(float(confidence))
                 boxes.append([left, top, width, height])
+
+
 
     # Perform non maximum suppression to eliminate redundant overlapping boxes with
     # lower confidences.
