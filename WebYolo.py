@@ -3,7 +3,7 @@ import argparse
 import sys
 import numpy as np
 import os.path
-
+import time
 
 # Initialize the parameters
 confThreshold = 0.5  # Confidence threshold
@@ -94,7 +94,11 @@ def postprocess(frame, outs):
                 confidences.append(float(confidence))
                 boxes.append([left, top, width, height])
 
-
+    global count
+    if (len(classIds) < 3):
+        count = count + 1
+        tm = time.localtime()
+        print(tm)
 
     # Perform non maximum suppression to eliminate redundant overlapping boxes with
     # lower confidences.
@@ -176,3 +180,6 @@ while cv.waitKey(10) < 0:
         vid_writer.write(frame.astype(np.uint8))
 
     cv.imshow(winName, frame)
+    print(count)
+
+
