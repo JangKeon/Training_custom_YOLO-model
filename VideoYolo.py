@@ -5,7 +5,8 @@ import numpy as np
 import os.path
 import time
 
-def TotalCode():
+
+def TotalCode(VideoInput):
     # Initialize the parameters
     confThreshold = 0.5  # Confidence threshold
     nmsThreshold = 0.4  # Non-maximum suppression threshold
@@ -40,14 +41,12 @@ def TotalCode():
         net.setPreferableTarget(cv.dnn.DNN_TARGET_CUDA)
         print('Using GPU device.')
 
-
     # Get the names of the output layers
     def getOutputsNames(net):
         # Get the names of all the layers in the network
         layersNames = net.getLayerNames()
         # Get the names of the output layers, i.e. the layers with unconnected outputs
         return [layersNames[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-
 
     # Draw the predicted bounding box
     def drawPred(classId, conf, left, top, right, bottom):
@@ -67,7 +66,6 @@ def TotalCode():
         cv.rectangle(frame, (left, top - round(1.5 * labelSize[1])), (left + round(1.5 * labelSize[0]), top + baseLine),
                      (255, 255, 255), cv.FILLED)
         cv.putText(frame, label, (left, top), cv.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 1)
-
 
     # Remove the bounding boxes with low confidence using non-maxima suppression
     def postprocess(frame, outs):
@@ -113,8 +111,6 @@ def TotalCode():
             height = box[3]
             drawPred(classIds[i], confidences[i], left, top, left + width, top + height)
 
-
-
     # Process inputs
     winName = 'Deep learning object detection in OpenCV'
     cv.namedWindow(winName, cv.WINDOW_NORMAL)
@@ -136,7 +132,7 @@ def TotalCode():
         outputFile = args.video[:-4] + '_yolo_out_py.avi'
     else:
         # Webcam input
-        cap = cv.VideoCapture(1)
+        cap = cv.VideoCapture(VideoInput)
 
     # Get the video writer initialized to save the output video
     if (not args.image):
@@ -184,3 +180,5 @@ def TotalCode():
         print(count)
 
 
+if __name__ == "__main__":
+    TotalCode()

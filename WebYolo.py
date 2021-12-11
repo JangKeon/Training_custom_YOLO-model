@@ -27,8 +27,20 @@ with open(classesFile, 'rt') as f:
 modelConfiguration = "C:\yolo_n.cfg"
 modelWeights = "C:\yolo_n_10000.weights"
 
+
 net = cv.dnn.readNetFromDarknet(modelConfiguration, modelWeights)
 count = 0
+exCount = 0
+recoredFrame = 0
+detectedFrame = False
+detectedTime = 0
+inferenceTime = 0
+totalDetectionTime = 0
+
+from matplotlib import pyplot as plt
+
+x_values = []   # x축 지점의 값들
+y_values = []   # y축 지점의 값들
 
 if (args.device == 'cpu'):
     net.setPreferableBackend(cv.dnn.DNN_BACKEND_OPENCV)
@@ -95,10 +107,27 @@ def postprocess(frame, outs):
                 boxes.append([left, top, width, height])
 
     global count
-    if (len(classIds) < 3):
-        count = count + 1
-        tm = time.localtime()
-        print(tm)
+    global recoredFrame
+    global detectedFrame
+    global detectedTime
+    global inferenceTime
+    global totalDetectionTime
+    recoredFrame += 1
+    print(len(classIds))
+    if len(classIds) < 4:
+        y_values.append(1)
+        if detectedFrame:
+            detectedTime += 1
+        else:
+            detectedFrame = True
+            detectedTime = 0
+    else:
+        y_values.append(0)
+        if detectedFrame:
+            detectedFrame = False
+            totalDetectionTime += (detectedTime * inferenceTime)
+            detectedTime = 0
+    x_values.append(recoredFrame)
 
     # Perform non maximum suppression to eliminate redundant overlapping boxes with
     # lower confidences.
@@ -170,7 +199,8 @@ while cv.waitKey(10) < 0:
 
     # Put efficiency information. The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
     t, _ = net.getPerfProfile()
-    label = 'Inference time: %.2f ms' % (t * 1000.0 / cv.getTickFrequency())
+    inferenceTime = (t * 1000.0 / cv.getTickFrequency())
+    label = 'Inference time: %.2f ms' % inferenceTime
     cv.putText(frame, label, (0, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
 
     # Write the frame with the detection boxes
@@ -180,6 +210,10 @@ while cv.waitKey(10) < 0:
         vid_writer.write(frame.astype(np.uint8))
 
     cv.imshow(winName, frame)
-    print(count)
 
-
+plt.plot(x_values, y_values)   # line 그래프를 그립니다
+plt.title("Detecting Graph")
+plt.xlabel("Time")
+plt.ylabel("Detect or not")
+plt.show()   # 그래프를 화면에 보여줍니다
+print("Total Time : ", totalDetectionTime)
