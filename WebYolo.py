@@ -140,6 +140,13 @@ def postprocess(frame, outs):
         width = box[2]
         height = box[3]
         drawPred(classIds[i], confidences[i], left, top, left + width, top + height)
+    if recoredFrame % 10 == 0:
+        plt.plot(x_values, y_values)  # line 그래프를 그립니다
+        plt.title("Detecting Graph")
+        plt.xlabel("Time")
+        plt.ylabel("Detect or not")
+        plt.show()  # 그래프를 화면에 보여줍니다
+        print("Total Time : %.2f second" % (totalDetectionTime / 1000))
 
 
 
@@ -211,9 +218,4 @@ while cv.waitKey(10) < 0:
 
     cv.imshow(winName, frame)
 
-plt.plot(x_values, y_values)   # line 그래프를 그립니다
-plt.title("Detecting Graph")
-plt.xlabel("Time")
-plt.ylabel("Detect or not")
-plt.show()   # 그래프를 화면에 보여줍니다
-print("Total Time : ", totalDetectionTime)
+
